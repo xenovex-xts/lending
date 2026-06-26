@@ -212,7 +212,12 @@ def get_applicant_wise_total_loan_security_qty(filters, loan_security_details):
 		.on(pledge.parent == lsa.name)
 		.select(lsa.applicant_type, lsa.applicant, pledge.loan_security, Sum(pledge.qty).as_("qty"))
 		.where(lsa.status == "Pledged")
-		.groupby(lsa.applicant, pledge.loan_security)
+		# .groupby(lsa.applicant, pledge.loan_security)
+		.groupby(
+			lsa.applicant_type,
+			lsa.applicant,
+			pledge.loan_security,
+		)
 	)
 	if company:
 		pledge_query = pledge_query.where(lsa.company == company)

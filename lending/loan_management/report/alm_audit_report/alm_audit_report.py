@@ -230,7 +230,14 @@ def get_overdue_details(as_on_date, company):
 			& (loan_demand.outstanding_amount > 0)
 			& (loan_demand.demand_type != "Charges")
 		)
-		.groupby(loan_demand.loan, loan_demand.demand_type, loan_demand.demand_subtype)
+		# .groupby(loan_demand.loan, loan_demand.demand_type, loan_demand.demand_subtype)
+		.groupby(
+			loan_demand.loan,
+			loan_demand.loan_product,
+			loan_demand.demand_type,
+			loan_demand.demand_subtype,
+			loan_demand.demand_date,
+		)
 	)
 
 	loan_demands = query.run(as_dict=1)
