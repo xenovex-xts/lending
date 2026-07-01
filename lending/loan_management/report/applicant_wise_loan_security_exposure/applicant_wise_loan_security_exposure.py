@@ -212,7 +212,9 @@ def get_applicant_wise_total_loan_security_qty(filters, loan_security_details):
 		.on(pledge.parent == lsa.name)
 		.select(lsa.applicant_type, lsa.applicant, pledge.loan_security, Sum(pledge.qty).as_("qty"))
 		.where(lsa.status == "Pledged")
-		.groupby(lsa.applicant, pledge.loan_security)
+		# PG strict GROUP BY: applicant_type is selected but not aggregated, so
+		# it must appear in GROUP BY (also a latent bug on MySQL 8).
+		.groupby(lsa.applicant_type, lsa.applicant, pledge.loan_security)
 	)
 	if company:
 		pledge_query = pledge_query.where(lsa.company == company)

@@ -108,8 +108,20 @@ def get_data(filters) -> list[list]:
 		unpledge_query = unpledge_query.where(unpldge_doctype.loan_security == loan_security)
 		pledge_query = pledge_query.where(pledge_doctype.loan_security == loan_security)
 
-	unpledges = unpledge_query.groupby(unpldge_doctype.loan_security).run(as_dict=True)
-	pledges = pledge_query.groupby(pledge_doctype.loan_security).run(as_dict=True)
+	# PG strict GROUP BY: every non-aggregated selected column (loan, time and
+	# loan_security_type, alongside loan_security) must be in GROUP BY.
+	unpledges = unpledge_query.groupby(
+		loan_security_release_doctype.loan,
+		unpldge_doctype.loan_security,
+		loan_security_release_doctype.unpledge_time,
+		unpldge_doctype.loan_security_type,
+	).run(as_dict=True)
+	pledges = pledge_query.groupby(
+		loan_security_assignment_doctype.loan,
+		pledge_doctype.loan_security,
+		loan_security_assignment_doctype.pledge_time,
+		pledge_doctype.loan_security_type,
+	).run(as_dict=True)
 
 	result = pledges + unpledges
 
