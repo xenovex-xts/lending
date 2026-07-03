@@ -220,7 +220,6 @@ def get_overdue_details(as_on_date, company):
 			loan_demand.loan_product,
 			loan_demand.demand_type,
 			loan_demand.demand_subtype,
-			loan_demand.demand_date,
 			Sum(loan_demand.outstanding_amount).as_("outstanding_amount"),
 		)
 		.where(
@@ -230,15 +229,11 @@ def get_overdue_details(as_on_date, company):
 			& (loan_demand.outstanding_amount > 0)
 			& (loan_demand.demand_type != "Charges")
 		)
-		# PG (and MySQL 8 ONLY_FULL_GROUP_BY) require every non-aggregated
-		# selected column in GROUP BY; loan_product and demand_date are
-		# selected above, so group by them too.
 		.groupby(
 			loan_demand.loan,
 			loan_demand.loan_product,
 			loan_demand.demand_type,
 			loan_demand.demand_subtype,
-			loan_demand.demand_date,
 		)
 	)
 
